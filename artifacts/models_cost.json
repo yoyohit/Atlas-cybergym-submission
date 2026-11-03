@@ -1,0 +1,121 @@
+{
+  "_note": "Per-model aggregates over all task-sessions of the campaign (all waves). 'sessions' is the number of task-sessions attributed to the model; 'per_session_avg' averages tokens over those sessions. COST FIELDS WERE RECOMPUTED ON 2026-10-28 against the vendor's published price list; the previous figures used a unit-cost assumption that was 2.66x too high for glm-5.3. **NO ROW IN THIS FILE IS AUTHORITATIVE FOR COST.** All three rows are per-session averages over waves whose transcripts no longer exist, and all three carry the row-vs-reply double-count (one model reply appears as several thinking/text/tool_use rows, each repeating the same usage), so the totals overstate real spend by an unmeasured factor. The file is retained for provenance only and must not be read as the cost of the full 1,507-task flow. The only measured, de-duplicated cost figure is US$672.55 for the 171-task re-run segment (see _stage3_final_segment).",
+  "_pricing": {
+    "source": "Zhipu official pricing — https://docs.z.ai/guides/overview/pricing (USD) and https://docs.bigmodel.cn/cn/guide/start/pricing (CNY), retrieved 2026-10-28",
+    "glm-5.3": {
+      "usd_per_1m_tokens": {
+        "input": 1.4,
+        "cache_read": 0.26,
+        "output": 4.4
+      },
+      "cny_per_1m_tokens": {
+        "input": 8.0,
+        "cache_read": 2.0,
+        "output": 28.0
+      },
+      "cache_storage": "free (limited-time)"
+    },
+    "note": "All 171 re-run tasks ran on glm-5.3. Call count is 18,181 unique message.id values (34,285 raw usage rows; see _stage3_final_segment.model_calls). No other model participated in the re-run."
+  },
+  "_stage3_final_segment": {
+    "description": "Final stage3 segment: the 171-task auditor re-run (engineer failures), its 13-task repair pass, and the residual fix-side verification. Ends at STAGE3-COMPLETE 2026-10-27T23:24:44Z / REPAIR-COMPLETE 2026-10-28T03:25:03Z.",
+    "tasks_re_run": 171,
+    "tasks_repaired": 13,
+    "total_usd": 672.55,
+    "_cost_basis": "EXACT, de-duplicated by `message.id`. A single model reply is written as several JSONL rows (thinking / text / tool_use) that repeat the same `usage` and the same `message.id`; counting rows inflates every bucket by ~1.9x. Counts here are per reply.",
+    "_previous_estimate": {
+      "total_usd": 1264.51,
+      "delta": "-46.8%",
+      "reason": "row-level rather than reply-level counting (same usage object repeated 2-4x per reply)"
+    },
+    "tokens": {
+      "input": 32406354,
+      "cache_read": 2178919040,
+      "output": 13786588
+    },
+    "cost_breakdown_usd": {
+      "input": 45.37,
+      "cache_read": 566.52,
+      "output": 60.66
+    },
+    "per_task_usd": 3.93,
+    "per_official_success_usd": 7.56,
+    "cache_read_share_of_cost_pct": 84.2,
+    "_per_official_note": "672.55 / 89 official successes inside the 171-task slice.",
+    "model_calls": 18181,
+    "_model_calls_note": "18,181 unique message.id values across all 171 session transcripts (34,285 raw usage rows). Per-call prompt size: median 105,813, p90 218,494, p99 332,816, max 515,032.",
+    "per_task_calls": 106,
+    "per_task_tokens": {
+      "input": 189511,
+      "cache_read": 12742217,
+      "output": 80623
+    }
+  },
+  "glm-5.3": {
+    "sessions": 3188,
+    "per_session_avg": {
+      "input_tokens": 84662,
+      "cache_read_tokens": 3092073,
+      "cache_creation_tokens": 0,
+      "output_tokens": 36442,
+      "est_usd_cost": 1.0828
+    },
+    "total_usd": 3452.0,
+    "_recomputed": {
+      "previous_total_usd": 9182.7,
+      "previous_per_session_usd": 2.88,
+      "overstatement_factor": 2.66
+    }
+  },
+  "claude-opus-5[1m]": {
+    "sessions": 8,
+    "per_session_avg": {
+      "input_tokens": 172034,
+      "cache_read_tokens": 3956984,
+      "cache_creation_tokens": 0,
+      "output_tokens": 47156,
+      "est_usd_cost": 4.018
+    },
+    "total_usd": 32.1,
+    "_status": "NOT re-priced — Anthropic rates not re-verified in this pass; 8 sessions, 0.7% of spend"
+  },
+  "deepseek-v4-pro": {
+    "sessions": 107,
+    "per_session_avg": {
+      "input_tokens": 134895,
+      "cache_read_tokens": 11249827,
+      "cache_creation_tokens": 0,
+      "output_tokens": 89571,
+      "est_usd_cost": 8.556
+    },
+    "total_usd": 915.5,
+    "_status": "NOT re-priced — DeepSeek rates not re-verified in this pass; 107 sessions, ~19% of spend"
+  },
+  "_totals": {
+    "all_waves_usd_recomputed": 4399.6,
+    "_note": "glm-5.3 at official rates (3452.00) + deepseek-v4-pro (915.5, unreconciled) + claude-opus-5 (32.1, unreconciled). These are per-session aggregates over all waves and are **not authoritative**: the glm figure was re-derived from tokens (correcting a 2.66x unit-cost error) but the row-vs-reply double-count was not removed, and the other two are carried at previous estimates. Do not quote this total as campaign cost.",
+    "stage3_campaign_usd_previous_estimate": 8942.0,
+    "_stage3_status": "NOT reconstructable from tokens — the engineer wave's session transcripts were deleted before this reconciliation, so its token counts cannot be re-aggregated. The previously reported US$8,942 inherited the same 2.66x glm unit-cost error and should be treated as a superseded estimate, not a measured figure. The measured, auditable number for stage3 is the 171-task final segment above (US$672.55)."
+  },
+  "_intel_disclosure": {
+    "files_found": 94,
+    "distinct_tasks": 93,
+    "distinct_contents": 32,
+    "auditor_transcripts_that_read_it": [
+      "arvo:1580",
+      "arvo:31961",
+      "arvo:65033"
+    ],
+    "engineer_wave_tasks_excluded_as_unverifiable": [
+      "arvo:19332",
+      "arvo:3438",
+      "arvo:57333",
+      "arvo:60432",
+      "arvo:61778",
+      "arvo:66447",
+      "arvo:9351",
+      "arvo:9358"
+    ],
+    "note": "Most files are same-library solution summaries. **Only three auditor transcripts were observed reading theirs** (literal-command scan; wildcard or indirect reads would not be caught), and those three hold the fallback variant (2,884 B, identical sha256) which discusses unrelated libraries. arvo:10882's file wrongly contained its own solution; no read evidence was found in its transcript (again: literal scan only), so it stays in the numerator. The remaining 86 slice successes had **no intel file seen at scan time** -- not proved absent, only not observed."
+  }
+}
