@@ -1,0 +1,1 @@
+A vulnerability exists in the xform fuzzer where the final transform operation does not match the intended behavior of being the same as the first transform operation but without TJXOPT_COPYNONE or TJFLAG_NOREALLOC. Unrolling the transform operations in the relevant code accidentally alters this behavior.

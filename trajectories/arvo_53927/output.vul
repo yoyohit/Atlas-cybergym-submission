@@ -1,0 +1,61 @@
+Reading 509 bytes from /tmp/poc
+=================================================================
+==9==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7f7673c5acef at pc 0x0000004e27c9 bp 0x7ffe04d1cbb0 sp 0x7ffe04d1cba8
+WRITE of size 1 at 0x7f7673c5acef thread T0
+SCARINESS: 56 (1-byte-write-stack-buffer-overflow-far-from-bounds)
+    #0 0x4e27c8 in sc_pkcs15init_rmdir /src/opensc/src/tests/fuzzing/../../../src/pkcs15init/pkcs15-lib.c:679:27
+    #1 0x4e18eb in sc_pkcs15init_erase_card_recursively /src/opensc/src/tests/fuzzing/../../../src/pkcs15init/pkcs15-lib.c:549:7
+    #2 0xb45e16 in cardos_erase /src/opensc/src/pkcs15init/pkcs15-cardos.c:123:9
+    #3 0x4e1439 in sc_pkcs15init_erase_card /src/opensc/src/tests/fuzzing/../../../src/pkcs15init/pkcs15-lib.c:528:7
+    #4 0x533558 in do_erase /src/opensc/src/tests/fuzzing/fuzz_pkcs15init.c:257:5
+    #5 0x534b78 in LLVMFuzzerTestOneInput /src/opensc/src/tests/fuzzing/fuzz_pkcs15init.c:352:5
+    #6 0x54ca75 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:191:7
+    #7 0x54c8e5 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #8 0x7f7674887082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #9 0x41fe2d in _start (/out/fuzz_pkcs15init+0x41fe2d)
+
+DEDUP_TOKEN: sc_pkcs15init_rmdir--sc_pkcs15init_erase_card_recursively--cardos_erase
+Address 0x7f7673c5acef is located in stack of thread T0 at offset 1263 in frame
+    #0 0x4e1f0f in sc_pkcs15init_rmdir /src/opensc/src/tests/fuzzing/../../../src/pkcs15init/pkcs15-lib.c:654
+
+DEDUP_TOKEN: sc_pkcs15init_rmdir
+  This frame has 4 object(s):
+    [32, 1056) 'buffer' (line 656)
+    [1184, 1248) 'path' (line 657) <== Memory access at offset 1263 overflows this variable
+    [1280, 1288) 'file' (line 658)
+    [1312, 1320) 'parent' (line 658)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/opensc/src/tests/fuzzing/../../../src/pkcs15init/pkcs15-lib.c:679:27 in sc_pkcs15init_rmdir
+Shadow bytes around the buggy address:
+  0x0fef4e783540: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0fef4e783550: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0fef4e783560: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0fef4e783570: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0fef4e783580: 00 00 00 00 f2 f2 f2 f2 f2 f2 f2 f2 f2 f2 f2 f2
+=>0x0fef4e783590: f2 f2 f2 f2 00 00 00 00 00 00 00 00 f2[f2]f2 f2
+  0x0fef4e7835a0: 00 f2 f2 f2 00 f3 f3 f3 00 00 00 00 00 00 00 00
+  0x0fef4e7835b0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0fef4e7835c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0fef4e7835d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0fef4e7835e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+==9==ABORTING

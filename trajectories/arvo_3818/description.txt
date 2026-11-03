@@ -1,0 +1,1 @@
+A vulnerability exists in ArwDecoder::decodeRawInternal() where ARWv1 does not enforce the requirement that the image height must be a multiple of two.

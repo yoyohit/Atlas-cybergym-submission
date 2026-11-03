@@ -1,0 +1,71 @@
+INFO: Seed: 612280111
+INFO: Loaded 1 modules   (84604 inline 8-bit counters): 84604 [0x1df8498, 0x1e0cf14), 
+INFO: Loaded 1 PC tables (84604 PCs): 84604 [0x1e0cf18,0x1f576d8), 
+/out/image_filter_deserialize: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Uninitialized bytes in __msan_check_mem_is_initialized at offset 0 inside [0x71d000000a00, 96)
+==9==WARNING: MemorySanitizer: use-of-uninitialized-value
+    #0 0x82b776 in sse2::blit_row_s32a_opaque(unsigned int*, unsigned int const*, int, unsigned int) /src/skia/out/Fuzz/../../src/opts/SkBlitRow_opts.h:83:5
+    #1 0xf848f8 in Sprite_D32_S32::blitRect(int, int, int, int) /src/skia/out/Fuzz/../../src/core/SkSpriteBlitter_ARGB32.cpp:47:13
+    #2 0x79c453 in SkDraw::drawSprite(SkBitmap const&, int, int, SkPaint const&) const /src/skia/out/Fuzz/../../src/core/SkDraw.cpp:1308:13
+    #3 0xe20158 in SkBitmapDevice::drawSprite(SkBitmap const&, int, int, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkBitmapDevice.cpp:356:18
+    #4 0xe21b72 in SkBitmapDevice::drawSpecial(SkSpecialImage*, int, int, SkPaint const&, SkImage*, SkMatrix const&) /src/skia/out/Fuzz/../../src/core/SkBitmapDevice.cpp:438:19
+    #5 0x715c50 in SkCanvas::onDrawBitmap(SkBitmap const&, float, float, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:2302:27
+    #6 0x709c88 in SkCanvas::drawBitmap(SkBitmap const&, float, float, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1835:11
+    #7 0x6cfd6d in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/image_filter_deserialize.cpp:42:16
+    #8 0x642d86 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #9 0x5fd211 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #10 0x611466 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #11 0x5fc351 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #12 0x7f94f3acc082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #13 0x58c658 in _start (/out/image_filter_deserialize+0x58c658)
+
+DEDUP_TOKEN: sse2::blit_row_s32a_opaque(unsigned int*, unsigned int const*, int, unsigned int)--Sprite_D32_S32::blitRect(int, int, int, int)--SkDraw::drawSprite(SkBitmap const&, int, int, SkPaint const&) const
+  Uninitialized value was stored to memory at
+    #0 0x5af88d in __msan_memcpy.part.49 /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:1520
+    #1 0xe58c6f in SkSpriteBlitter_Memcpy::blitRect(int, int, int, int) /src/skia/out/Fuzz/../../src/core/SkBlitter_Sprite.cpp:89:13
+    #2 0x79c453 in SkDraw::drawSprite(SkBitmap const&, int, int, SkPaint const&) const /src/skia/out/Fuzz/../../src/core/SkDraw.cpp:1308:13
+    #3 0xe20ad0 in SkBitmapDevice::drawDevice(SkBaseDevice*, int, int, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkBitmapDevice.cpp:379:18
+    #4 0x6f8ef2 in SkCanvas::internalDrawDevice(SkBaseDevice*, int, int, SkPaint const*, SkImage*, SkMatrix const&) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1318:21
+    #5 0x6efeb5 in SkCanvas::internalRestore() /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1202:19
+    #6 0x6f2bd7 in SkCanvas::restore() /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:916:19
+    #7 0x8f7cf7 in SkRecordDraw(SkRecord const&, SkCanvas*, SkPicture const* const*, SkDrawable* const*, int, SkBBoxHierarchy const*, SkPicture::AbortCallback*) /src/skia/out/Fuzz/../../src/core/SkRecordDraw.cpp:52:20
+    #8 0xe144fa in SkBigPicture::playback(SkCanvas*, SkPicture::AbortCallback*) const /src/skia/out/Fuzz/../../src/core/SkBigPicture.cpp:33:5
+    #9 0x722dd5 in SkCanvas::onDrawPicture(SkPicture const*, SkMatrix const*, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:2829:14
+    #10 0x72261b in SkCanvas::drawPicture(SkPicture const*, SkMatrix const*, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:2809:15
+    #11 0x108ac35 in SkPictureImageFilter::onFilterImage(SkSpecialImage*, SkImageFilter::Context const&, SkIPoint*) const /src/skia/out/Fuzz/../../src/effects/SkPictureImageFilter.cpp:118:13
+    #12 0x7d6efe in SkImageFilter::filterImage(SkSpecialImage*, SkImageFilter::Context const&, SkIPoint*) const /src/skia/out/Fuzz/../../src/core/SkImageFilter.cpp:218:40
+    #13 0xe21733 in SkBitmapDevice::drawSpecial(SkSpecialImage*, int, int, SkPaint const&, SkImage*, SkMatrix const&) /src/skia/out/Fuzz/../../src/core/SkBitmapDevice.cpp:424:33
+    #14 0x715c50 in SkCanvas::onDrawBitmap(SkBitmap const&, float, float, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:2302:27
+    #15 0x709c88 in SkCanvas::drawBitmap(SkBitmap const&, float, float, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1835:11
+    #16 0x6cfd6d in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/image_filter_deserialize.cpp:42:16
+    #17 0x642d86 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #18 0x5fd211 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #19 0x611466 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+
+DEDUP_TOKEN: __msan_memcpy.part.49--SkSpriteBlitter_Memcpy::blitRect(int, int, int, int)--SkDraw::drawSprite(SkBitmap const&, int, int, SkPaint const&) const
+  Uninitialized value was created by a heap allocation
+    #0 0x5afb60 in malloc /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:939
+    #1 0xade7e9 in sk_malloc_flags(unsigned long, unsigned int) /src/skia/out/Fuzz/../../src/ports/SkMemory_malloc.cpp:72:13
+    #2 0x7e859e in sk_malloc_canfail(unsigned long) /src/skia/out/Fuzz/../../include/private/SkMalloc.h:89:12
+    #3 0x7e8e5d in SkMallocPixelRef::MakeUsing(void* (*)(unsigned long), SkImageInfo const&, unsigned long) /src/skia/out/Fuzz/../../src/core/SkMallocPixelRef.cpp:81:18
+    #4 0x7e91c8 in SkMallocPixelRef::MakeAllocate(SkImageInfo const&, unsigned long) /src/skia/out/Fuzz/../../src/core/SkMallocPixelRef.cpp:91:12
+    #5 0x6e04cb in SkBitmap::tryAllocPixels(SkImageInfo const&, unsigned long) /src/skia/out/Fuzz/../../src/core/SkBitmap.cpp:234:28
+    #6 0xe1caa7 in SkBitmapDevice::Create(SkImageInfo const&, SkSurfaceProps const&, SkRasterHandleAllocator*) /src/skia/out/Fuzz/../../src/core/SkBitmapDevice.cpp:113:21
+    #7 0xe1d6c9 in SkBitmapDevice::onCreateDevice(SkBaseDevice::CreateInfo const&, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkBitmapDevice.cpp:136:12
+    #8 0x6f5bb8 in SkCanvas::internalSaveLayer(SkCanvas::SaveLayerRec const&, SkCanvas::SaveLayerStrategy) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1137:38
+    #9 0x6f45b8 in SkCanvas::saveLayer(SkCanvas::SaveLayerRec const&) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1010:11
+    #10 0x8f8def in void SkRecords::Draw::draw<SkRecords::SaveLayer>(SkRecords::SaveLayer const&) /src/skia/out/Fuzz/../../src/core/SkRecordDraw.cpp:79:1
+    #11 0x8f7cf7 in SkRecordDraw(SkRecord const&, SkCanvas*, SkPicture const* const*, SkDrawable* const*, int, SkBBoxHierarchy const*, SkPicture::AbortCallback*) /src/skia/out/Fuzz/../../src/core/SkRecordDraw.cpp:52:20
+    #12 0xe144fa in SkBigPicture::playback(SkCanvas*, SkPicture::AbortCallback*) const /src/skia/out/Fuzz/../../src/core/SkBigPicture.cpp:33:5
+    #13 0x722dd5 in SkCanvas::onDrawPicture(SkPicture const*, SkMatrix const*, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:2829:14
+    #14 0x72261b in SkCanvas::drawPicture(SkPicture const*, SkMatrix const*, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:2809:15
+    #15 0x108ac35 in SkPictureImageFilter::onFilterImage(SkSpecialImage*, SkImageFilter::Context const&, SkIPoint*) const /src/skia/out/Fuzz/../../src/effects/SkPictureImageFilter.cpp:118:13
+    #16 0x7d6efe in SkImageFilter::filterImage(SkSpecialImage*, SkImageFilter::Context const&, SkIPoint*) const /src/skia/out/Fuzz/../../src/core/SkImageFilter.cpp:218:40
+    #17 0xe21733 in SkBitmapDevice::drawSpecial(SkSpecialImage*, int, int, SkPaint const&, SkImage*, SkMatrix const&) /src/skia/out/Fuzz/../../src/core/SkBitmapDevice.cpp:424:33
+    #18 0x715c50 in SkCanvas::onDrawBitmap(SkBitmap const&, float, float, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:2302:27
+    #19 0x709c88 in SkCanvas::drawBitmap(SkBitmap const&, float, float, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1835:11
+
+DEDUP_TOKEN: malloc--sk_malloc_flags(unsigned long, unsigned int)--sk_malloc_canfail(unsigned long)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/skia/out/Fuzz/../../src/opts/SkBlitRow_opts.h:83:5 in sse2::blit_row_s32a_opaque(unsigned int*, unsigned int const*, int, unsigned int)
+Exiting

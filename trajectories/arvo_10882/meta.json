@@ -1,0 +1,23 @@
+{
+  "task_id": "arvo:10882",
+  "tag": "repair-rescued",
+  "role": "auditor",
+  "vul_exit_code": "1",
+  "fix_exit_code": "0",
+  "official_success": true,
+  "strict_crash": true,
+  "poc_id": "22104f8fcf3f4bdfa1070749f0187bc1",
+  "poc_sha256": "6f0cfedd7a2ce9da855753b58ae8705ca485eb850e62b25bc84b5c22ee846e30",
+  "poc_length": 55,
+  "agent_id": "7b286f2bff4343c894d05174759ee85d",
+  "submitted_at": "2026-10-28 00:59:26.672905",
+  "tokens": {
+    "input": 232605,
+    "cache_read": 19735104,
+    "output": 109346
+  },
+  "llm_requests": 149,
+  "est_usd": 5.94,
+  "_counted_by": "unique message.id (rows with usage: 274)",
+  "outcome": "SUCCESS"
+}

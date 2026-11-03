@@ -1,0 +1,1 @@
+A double-free vulnerability exists in the parser where the variable tmp is freed unnecessarily, even though tmp is already freed at fconf_error.

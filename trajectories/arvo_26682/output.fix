@@ -1,0 +1,10 @@
+INFO: Seed: 2275858321
+INFO: Loaded 1 modules   (3031 inline 8-bit counters): 3031 [0x81095b, 0x811532), 
+INFO: Loaded 1 PC tables (3031 PCs): 3031 [0x5c1c40,0x5cd9b0), 
+/out/uncompress_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Executed /tmp/poc in 93 ms
+***
+*** NOTE: fuzzing was not performed, you have only
+***       executed the target code on a fixed set of inputs.
+***

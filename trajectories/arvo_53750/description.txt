@@ -1,0 +1,1 @@
+A vulnerability exists in the decode_r11 function in which a post HEADER overflow can occur.

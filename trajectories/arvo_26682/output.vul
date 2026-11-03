@@ -1,0 +1,74 @@
+INFO: Seed: 415303280
+INFO: Loaded 1 modules   (3029 inline 8-bit counters): 3029 [0x81095b, 0x811530), 
+INFO: Loaded 1 PC tables (3029 PCs): 3029 [0x5c1c70,0x5cd9c0), 
+/out/uncompress_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+==9==WARNING: MemorySanitizer: use-of-uninitialized-value
+    #0 0x538858 in tinfl_decompress /src/miniz/build/amalgamation/miniz.c:2858:13
+    #1 0x5330eb in mz_inflate /src/miniz/build/amalgamation/miniz.c:467:18
+    #2 0x541650 in mz_uncompress2 /src/miniz/build/amalgamation/miniz.c:575:14
+    #3 0x541c19 in mz_uncompress /src/miniz/build/amalgamation/miniz.c:589:12
+    #4 0x522afb in LLVMFuzzerTestOneInput /src/miniz/tests/uncompress_fuzzer.c:24:16
+    #5 0x458191 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:595:15
+    #6 0x443262 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #7 0x44931e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:852:9
+    #8 0x471302 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #9 0x7fe00b292082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #10 0x41e538 in _start (/out/uncompress_fuzzer+0x41e538)
+
+DEDUP_TOKEN: tinfl_decompress--mz_inflate--mz_uncompress2
+  Uninitialized value was stored to memory at
+    #0 0x53f46b in tinfl_decompress /src/miniz/build/amalgamation/miniz.c:2769:37
+    #1 0x5330eb in mz_inflate /src/miniz/build/amalgamation/miniz.c:467:18
+    #2 0x541650 in mz_uncompress2 /src/miniz/build/amalgamation/miniz.c:575:14
+    #3 0x541c19 in mz_uncompress /src/miniz/build/amalgamation/miniz.c:589:12
+    #4 0x522afb in LLVMFuzzerTestOneInput /src/miniz/tests/uncompress_fuzzer.c:24:16
+    #5 0x458191 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:595:15
+    #6 0x443262 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #7 0x44931e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:852:9
+    #8 0x471302 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #9 0x7fe00b292082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+
+DEDUP_TOKEN: tinfl_decompress--mz_inflate--mz_uncompress2
+  Uninitialized value was stored to memory at
+    #0 0x53f41d in tinfl_decompress /src/miniz/build/amalgamation/miniz.c:2768:37
+    #1 0x5330eb in mz_inflate /src/miniz/build/amalgamation/miniz.c:467:18
+    #2 0x541650 in mz_uncompress2 /src/miniz/build/amalgamation/miniz.c:575:14
+    #3 0x541c19 in mz_uncompress /src/miniz/build/amalgamation/miniz.c:589:12
+    #4 0x522afb in LLVMFuzzerTestOneInput /src/miniz/tests/uncompress_fuzzer.c:24:16
+    #5 0x458191 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:595:15
+    #6 0x443262 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #7 0x44931e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:852:9
+    #8 0x471302 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #9 0x7fe00b292082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+
+DEDUP_TOKEN: tinfl_decompress--mz_inflate--mz_uncompress2
+  Uninitialized value was stored to memory at
+    #0 0x53f3ca in tinfl_decompress /src/miniz/build/amalgamation/miniz.c:2767:37
+    #1 0x5330eb in mz_inflate /src/miniz/build/amalgamation/miniz.c:467:18
+    #2 0x541650 in mz_uncompress2 /src/miniz/build/amalgamation/miniz.c:575:14
+    #3 0x541c19 in mz_uncompress /src/miniz/build/amalgamation/miniz.c:589:12
+    #4 0x522afb in LLVMFuzzerTestOneInput /src/miniz/tests/uncompress_fuzzer.c:24:16
+    #5 0x458191 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:595:15
+    #6 0x443262 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #7 0x44931e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:852:9
+    #8 0x471302 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #9 0x7fe00b292082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+
+DEDUP_TOKEN: tinfl_decompress--mz_inflate--mz_uncompress2
+  Uninitialized value was created by a heap allocation
+    #0 0x4d146d in __interceptor_malloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:901:3
+    #1 0x522a98 in LLVMFuzzerTestOneInput /src/miniz/tests/uncompress_fuzzer.c:22:31
+    #2 0x458191 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:595:15
+    #3 0x443262 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #4 0x44931e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:852:9
+    #5 0x471302 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #6 0x7fe00b292082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+
+DEDUP_TOKEN: __interceptor_malloc--LLVMFuzzerTestOneInput--fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/miniz/build/amalgamation/miniz.c:2858:13 in tinfl_decompress
+Unique heap origins: 26
+Stack depot allocated bytes: 1776
+Unique origin histories: 6
+History depot allocated bytes: 144
+Exiting

@@ -1,0 +1,58 @@
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1292961656
+INFO: Loaded 1 modules   (88883 inline 8-bit counters): 88883 [0x1100030, 0x1115b63), 
+INFO: Loaded 1 PC tables (88883 PCs): 88883 [0x1115b68,0x1270e98), 
+/out/flb-it-fuzz-config_random_fuzzer_OSSFUZZ: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[2026/10/26 17:02:54] [error] [multiline_parser] invalid type 'zzz'
+=================================================================
+==9==ERROR: AddressSanitizer: attempting double-free on 0x603000003850 in thread T0:
+SCARINESS: 42 (double-free)
+    #0 0x553db2 in __interceptor_free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:111:3
+    #1 0x5df070 in flb_free /src/fluent-bit/include/fluent-bit/flb_mem.h:97:5
+    #2 0x5df070 in flb_sds_destroy /src/fluent-bit/src/flb_sds.c:471:5
+    #3 0x5b0cf9 in multiline_parser_conf_file /src/fluent-bit/src/flb_parser.c:822:5
+    #4 0x5b0cf9 in flb_parser_conf_file /src/fluent-bit/src/flb_parser.c:876:11
+    #5 0x58afea in LLVMFuzzerTestOneInput /src/fluent-bit/tests/internal/fuzzers/config_random_fuzzer.c:45:5
+    #6 0x485733 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #7 0x4713c2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #8 0x476c0c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #9 0x49f802 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7f67cec99082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #11 0x44fbed in _start (/out/flb-it-fuzz-config_random_fuzzer_OSSFUZZ+0x44fbed)
+
+DEDUP_TOKEN: __interceptor_free--flb_free--flb_sds_destroy
+0x603000003850 is located 0 bytes inside of 20-byte region [0x603000003850,0x603000003864)
+freed by thread T0 here:
+    #0 0x553db2 in __interceptor_free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:111:3
+    #1 0x5df070 in flb_free /src/fluent-bit/include/fluent-bit/flb_mem.h:97:5
+    #2 0x5df070 in flb_sds_destroy /src/fluent-bit/src/flb_sds.c:471:5
+    #3 0x5b0c89 in multiline_parser_conf_file /src/fluent-bit/src/flb_parser.c:748:17
+    #4 0x5b0c89 in flb_parser_conf_file /src/fluent-bit/src/flb_parser.c:876:11
+    #5 0x58afea in LLVMFuzzerTestOneInput /src/fluent-bit/tests/internal/fuzzers/config_random_fuzzer.c:45:5
+    #6 0x485733 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #7 0x4713c2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #8 0x476c0c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #9 0x49f802 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7f67cec99082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+
+DEDUP_TOKEN: __interceptor_free--flb_free--flb_sds_destroy
+previously allocated by thread T0 here:
+    #0 0x55401d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:129:3
+    #1 0x5db5d0 in flb_malloc /src/fluent-bit/include/fluent-bit/flb_mem.h:56:12
+    #2 0x5db5d0 in sds_alloc /src/fluent-bit/src/flb_sds.c:42:11
+    #3 0x5db5d0 in flb_sds_create_size /src/fluent-bit/src/flb_sds.c:94:12
+    #4 0x5cb211 in flb_env_var_translate /src/fluent-bit/src/flb_env.c:181:11
+    #5 0x5af84b in get_parser_key /src/fluent-bit/src/flb_parser.c:442:11
+    #6 0x5af84b in multiline_parser_conf_file /src/fluent-bit/src/flb_parser.c:739:15
+    #7 0x5af84b in flb_parser_conf_file /src/fluent-bit/src/flb_parser.c:876:11
+    #8 0x58afea in LLVMFuzzerTestOneInput /src/fluent-bit/tests/internal/fuzzers/config_random_fuzzer.c:45:5
+    #9 0x485733 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #10 0x4713c2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #11 0x476c0c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #12 0x49f802 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7f67cec99082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+
+DEDUP_TOKEN: malloc--flb_malloc--sds_alloc
+SUMMARY: AddressSanitizer: double-free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:111:3 in __interceptor_free
+==9==ABORTING

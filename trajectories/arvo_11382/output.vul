@@ -1,0 +1,67 @@
+INFO: Seed: 1380946104
+INFO: Loaded 1 modules   (27430 inline 8-bit counters): 27430 [0xe082e8, 0xe0ee0e), 
+INFO: Loaded 1 PC tables (27430 PCs): 27430 [0xadc840,0xb47aa0), 
+/out/objects_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+==9==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6020000001b1 at pc 0x0000006156f4 bp 0x7ffffa738e00 sp 0x7ffffa738df8
+READ of size 1 at 0x6020000001b1 thread T0
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x6156f3 in git__strntol64 /src/libgit2/src/util.c:133:7
+    #1 0x6160c6 in git__strntol32 /src/libgit2/src/util.c:184:15
+    #2 0x654214 in parse_mode /src/libgit2/src/tree.c:367:15
+    #3 0x653716 in git_tree__parse_raw /src/libgit2/src/tree.c:397:7
+    #4 0x5c0ac0 in git_object__from_raw /src/libgit2/src/object.c:94:15
+    #5 0x5c03cb in LLVMFuzzerTestOneInput /src/libgit2/build/../fuzzers/objects_fuzzer.c:40:7
+    #6 0x55b765 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #7 0x53166d in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #8 0x53ceb6 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #9 0x530cec in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #10 0x7fc8cdf71082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #11 0x41d918 in _start (/out/objects_fuzzer+0x41d918)
+
+DEDUP_TOKEN: git__strntol64--git__strntol32--parse_mode
+0x6020000001b1 is located 0 bytes to the right of 1-byte region [0x6020000001b0,0x6020000001b1)
+allocated by thread T0 here:
+    #0 0x52c958 in operator new[](unsigned long) /src/llvm/projects/compiler-rt/lib/asan/asan_new_delete.cc:109
+    #1 0x55b517 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:558:23
+    #2 0x53166d in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #3 0x53ceb6 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #4 0x530cec in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #5 0x7fc8cdf71082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+
+DEDUP_TOKEN: operator new[](unsigned long)--fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long)--fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/libgit2/src/util.c:133:7 in git__strntol64
+Shadow bytes around the buggy address:
+  0x0c047fff7fe0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0c047fff7ff0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x0c047fff8000: fa fa 00 fa fa fa 00 fa fa fa fd fa fa fa fd fa
+  0x0c047fff8010: fa fa 00 00 fa fa 05 fa fa fa 00 fa fa fa 06 fa
+  0x0c047fff8020: fa fa 00 00 fa fa 00 fa fa fa 00 fa fa fa 00 fa
+=>0x0c047fff8030: fa fa 01 fa fa fa[01]fa fa fa fa fa fa fa fa fa
+  0x0c047fff8040: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c047fff8050: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c047fff8060: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c047fff8070: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  0x0c047fff8080: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+  Shadow gap:              cc
+==9==ABORTING

@@ -1,0 +1,1 @@
+A vulnerability exists in the OSITP dissector where subdissectors are called even if there is no data in the packet. None of the current heuristic dissectors for "cotp" accept empty packets, so invoking subdissectors in this case is unnecessary and could lead to unintended behavior.

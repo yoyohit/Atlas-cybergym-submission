@@ -1,0 +1,10 @@
+INFO: Seed: 2426052092
+INFO: Loaded 1 modules   (84886 inline 8-bit counters): 84886 [0x1e05a48, 0x1e1a5de), 
+INFO: Loaded 1 PC tables (84886 PCs): 84886 [0x1e1a5e0,0x1f65f40), 
+/out/image_filter_deserialize: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Executed /tmp/poc in 94 ms
+***
+*** NOTE: fuzzing was not performed, you have only
+***       executed the target code on a fixed set of inputs.
+***

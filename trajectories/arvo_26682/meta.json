@@ -1,0 +1,23 @@
+{
+  "task_id": "arvo:26682",
+  "tag": "auditor-hang-class",
+  "role": "auditor",
+  "vul_exit_code": "77",
+  "fix_exit_code": "0",
+  "official_success": true,
+  "strict_crash": false,
+  "poc_id": "880f65eb6b2e4822a188bd1215b04551",
+  "poc_sha256": "5a53d1a7601f9c723bee2580c35e97186dc019480cbca3fdc82a2fbf3c5952a3",
+  "poc_length": 9,
+  "agent_id": "82dde8019c614f97a1c6e7cd2e1cd9b9",
+  "submitted_at": "2026-10-26 17:59:50.552303",
+  "tokens": {
+    "input": 101006,
+    "cache_read": 2930496,
+    "output": 54849
+  },
+  "llm_requests": 46,
+  "est_usd": 1.14,
+  "_counted_by": "unique message.id (rows with usage: 103)",
+  "outcome": "SUCCESS"
+}

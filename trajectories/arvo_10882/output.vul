@@ -1,0 +1,37 @@
+oss-fuzzshark: disabling: udp
+oss-fuzzshark: disabling: udplite
+oss-fuzzshark: disabling: ospf
+oss-fuzzshark: disabling: bgp
+oss-fuzzshark: disabling: dhcp
+oss-fuzzshark: disabling: json
+oss-fuzzshark: disabling: snort
+oss-fuzzshark: configured for dissector: ip
+INFO: Seed: 324529483
+INFO: Loaded 1 modules   (397114 inline 8-bit counters): 397114 [0x4841450, 0x48a238a), 
+INFO: Loaded 1 PC tables (397114 PCs): 397114 [0x48a2390,0x4eb1730), 
+/out/fuzzshark_ip: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+==9==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x000000000000 (pc 0x0000004783ae bp 0x7ffc451cfc30 sp 0x7ffc451cfa68 T9)
+==9==The signal is caused by a READ memory access.
+==9==Hint: address points to the zero page.
+    #0 0x4783ad in except_pop /src/wireshark/epan/except.c:262:36
+    #1 0xae50d5 in dissect_frame /src/wireshark/epan/dissectors/packet-frame.c:710:3
+    #2 0x47edc5 in call_dissector_through_handle /src/wireshark/epan/packet.c:706:9
+    #3 0x47edc5 in call_dissector_work /src/wireshark/epan/packet.c:791
+    #4 0x47d157 in call_dissector_only /src/wireshark/epan/packet.c:3141:8
+    #5 0x47d157 in call_dissector_with_data /src/wireshark/epan/packet.c:3154
+    #6 0x47cf78 in dissect_record /src/wireshark/epan/packet.c:580:3
+    #7 0x477b03 in epan_dissect_run /src/wireshark/epan/epan.c:534:2
+    #8 0x4343ad in LLVMFuzzerTestOneInput /src/wireshark/tools/oss-fuzzshark/fuzzshark.c:360:2
+    #9 0x444468 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:570:15
+    #10 0x434dbd in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #11 0x438ceb in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #12 0x434aa8 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #13 0x7fe58628d082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #14 0x409288 in _start (/out/fuzzshark_ip+0x409288)
+
+DEDUP_TOKEN: except_pop--dissect_frame--call_dissector_through_handle
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/wireshark/epan/except.c:262:36 in except_pop
+==9==ABORTING
