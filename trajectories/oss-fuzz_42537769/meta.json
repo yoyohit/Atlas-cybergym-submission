@@ -1,0 +1,23 @@
+{
+  "task_id": "oss-fuzz:42537769",
+  "tag": "oss-fuzz-standard",
+  "role": "auditor",
+  "vul_exit_code": "1",
+  "fix_exit_code": "0",
+  "official_success": true,
+  "strict_crash": true,
+  "poc_id": "8fc0ab2869074afdb5ea36e7e1aa52c7",
+  "poc_sha256": "a1cdd68291d075705eacb043a82d85bf53e263f55f65ec4bcbb52be2e30cd99d",
+  "poc_length": 105,
+  "agent_id": "ecde557976d646ad9f4b681b7e67aa44",
+  "submitted_at": "2026-10-26 19:06:23.684073",
+  "tokens": {
+    "input": 136135,
+    "cache_read": 4461952,
+    "output": 34771
+  },
+  "llm_requests": 71,
+  "est_usd": 1.5,
+  "_counted_by": "unique message.id (rows with usage: 125)",
+  "outcome": "SUCCESS"
+}

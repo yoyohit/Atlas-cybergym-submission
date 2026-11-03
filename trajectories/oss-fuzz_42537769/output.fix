@@ -1,0 +1,26 @@
++ FUZZER=ffmpeg_AV_CODEC_ID_HEVC_fuzzer
++ shift
++ '[' '!' -v TESTCASE ']'
++ TESTCASE=/testcase
++ '[' '!' -f /testcase ']'
++ export RUN_FUZZER_MODE=interactive
++ RUN_FUZZER_MODE=interactive
++ export FUZZING_ENGINE=libfuzzer
++ FUZZING_ENGINE=libfuzzer
++ export SKIP_SEED_CORPUS=1
++ SKIP_SEED_CORPUS=1
++ run_fuzzer ffmpeg_AV_CODEC_ID_HEVC_fuzzer /testcase
+sysctl: setting key "vm.mmap_rnd_bits", ignoring: Read-only file system
+/out/ffmpeg_AV_CODEC_ID_HEVC_fuzzer -rss_limit_mb=2560 -timeout=25 /testcase -max_len=1000000 < /dev/null
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2306890125
+INFO: Loaded 1 modules   (74016 inline 8-bit counters): 74016 [0x55a00d465038, 0x55a00d477158), 
+INFO: Loaded 1 PC tables (74016 PCs): 74016 [0x55a00d477158,0x55a00d598358), 
+/out/ffmpeg_AV_CODEC_ID_HEVC_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /testcase
+pixels decoded: 986624, samples decoded: 0, iterations: 2
+Executed /testcase in 184 ms
+***
+*** NOTE: fuzzing was not performed, you have only
+***       executed the target code on a fixed set of inputs.
+***

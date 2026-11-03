@@ -1,0 +1,25 @@
++ FUZZER=mvc_dec_fuzzer
++ shift
++ '[' '!' -v TESTCASE ']'
++ TESTCASE=/testcase
++ '[' '!' -f /testcase ']'
++ export RUN_FUZZER_MODE=interactive
++ RUN_FUZZER_MODE=interactive
++ export FUZZING_ENGINE=libfuzzer
++ FUZZING_ENGINE=libfuzzer
++ export SKIP_SEED_CORPUS=1
++ SKIP_SEED_CORPUS=1
++ run_fuzzer mvc_dec_fuzzer /testcase
+sysctl: setting key "vm.mmap_rnd_bits", ignoring: Read-only file system
+/out/mvc_dec_fuzzer -rss_limit_mb=2560 -timeout=25 /testcase < /dev/null
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2600784835
+INFO: Loaded 1 modules   (10833 inline 8-bit counters): 10833 [0x562e86415968, 0x562e864183b9), 
+INFO: Loaded 1 PC tables (10833 PCs): 10833 [0x562e864183c0,0x562e864428d0), 
+/out/mvc_dec_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /testcase
+Executed /testcase in 57 ms
+***
+*** NOTE: fuzzing was not performed, you have only
+***       executed the target code on a fixed set of inputs.
+***

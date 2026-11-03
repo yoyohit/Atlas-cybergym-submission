@@ -1,0 +1,1 @@
+A vulnerability exists in fuzz/ParseFuzzer.cpp where the maxChars input for the call to uriToStringW is not properly handled.

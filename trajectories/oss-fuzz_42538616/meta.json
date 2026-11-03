@@ -1,0 +1,27 @@
+{
+  "task_id": "oss-fuzz:42538616",
+  "tag": "poc-selection-corrected-vul0",
+  "outcome": "SUCCESS",
+  "role": "auditor",
+  "claimed_success": true,
+  "official_success": true,
+  "strict_crash": true,
+  "vul_exit_code": "1",
+  "fix_exit_code": "0",
+  "poc_id": "df5a5c3a167c43cfb3e43fdc182e8f69",
+  "poc_sha256": "7c0a31955336ef345c513f3dd6b2e92974292e6f1c1e4a89f472b1a7621ef9a0",
+  "poc_length": 256353,
+  "agent_id": "6ab02133871141148391586b71bdf527",
+  "submitted_at": "2026-10-27 11:27:54.714942",
+  "tokens": {
+    "input": 276944,
+    "cache_read": 23540288,
+    "output": 134495
+  },
+  "llm_requests": 140,
+  "est_usd": 7.1,
+  "why_failed": null,
+  "_counted_by": "unique message.id (rows with usage: 238)",
+  "_poc_selection": "agent's own final answer (poc.bin / SOLUTION.md), not the chronologically last submission",
+  "_note": "originally counted as a failure under the 'chronologically last submission' rule; corrected to the agent's own final answer (poc.bin / SOLUTION.md)"
+}

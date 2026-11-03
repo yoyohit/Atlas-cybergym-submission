@@ -1,0 +1,105 @@
++ FUZZER=ffmpeg_AV_CODEC_ID_HEVC_fuzzer
++ shift
++ '[' '!' -v TESTCASE ']'
++ TESTCASE=/testcase
++ '[' '!' -f /testcase ']'
++ export RUN_FUZZER_MODE=interactive
++ RUN_FUZZER_MODE=interactive
++ export FUZZING_ENGINE=libfuzzer
++ FUZZING_ENGINE=libfuzzer
++ export SKIP_SEED_CORPUS=1
++ SKIP_SEED_CORPUS=1
++ run_fuzzer ffmpeg_AV_CODEC_ID_HEVC_fuzzer /testcase
+sysctl: setting key "vm.mmap_rnd_bits", ignoring: Read-only file system
+/out/ffmpeg_AV_CODEC_ID_HEVC_fuzzer -rss_limit_mb=2560 -timeout=25 /testcase -max_len=1000000 < /dev/null
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 114316987
+INFO: Loaded 1 modules   (74016 inline 8-bit counters): 74016 [0x55cc379c2038, 0x55cc379d4158), 
+INFO: Loaded 1 PC tables (74016 PCs): 74016 [0x55cc379d4158,0x55cc37af5358), 
+/out/ffmpeg_AV_CODEC_ID_HEVC_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /testcase
+==20==WARNING: MemorySanitizer: use-of-uninitialized-value
+    #0 0x55cc374c7ee1 in sao_edge_filter_8 /src/ffmpeg/./libavcodec/h26x/h2656_sao_template.c:73:37
+    #1 0x55cc374f6b6e in sao_filter_CTB /src/ffmpeg/libavcodec/hevc/filter.c:458:13
+    #2 0x55cc374efdb3 in ff_hevc_hls_filter /src/ffmpeg/libavcodec/hevc/filter.c:890:13
+    #3 0x55cc374f828a in ff_hevc_hls_filters /src/ffmpeg/libavcodec/hevc/filter.c:913:9
+    #4 0x55cc36f9950b in hls_decode_entry /src/ffmpeg/libavcodec/hevc/hevcdec.c:2566:9
+    #5 0x55cc36f9950b in decode_slice_data /src/ffmpeg/libavcodec/hevc/hevcdec.c:2814:12
+    #6 0x55cc36f9950b in decode_slice /src/ffmpeg/libavcodec/hevc/hevcdec.c:3194:11
+    #7 0x55cc36f9950b in decode_nal_unit /src/ffmpeg/libavcodec/hevc/hevcdec.c:3260:15
+    #8 0x55cc36f9950b in decode_nal_units /src/ffmpeg/libavcodec/hevc/hevcdec.c:3361:15
+    #9 0x55cc36f870a3 in hevc_decode_frame /src/ffmpeg/libavcodec/hevc/hevcdec.c:3442:14
+    #10 0x55cc36f69735 in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:429:20
+    #11 0x55cc36f69735 in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:600:15
+    #12 0x55cc36f69735 in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:631:15
+    #13 0x55cc36f68c4d in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:721:15
+    #14 0x55cc36f566f3 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:534:25
+    #15 0x55cc36e49140 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #16 0x55cc36e343b5 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #17 0x55cc36e39e4f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #18 0x55cc36e650f2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #19 0x7f5a16950082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+    #20 0x55cc36e2c59d in _start (/out/ffmpeg_AV_CODEC_ID_HEVC_fuzzer+0x23159d)
+
+DEDUP_TOKEN: sao_edge_filter_8--sao_filter_CTB--ff_hevc_hls_filter
+  Uninitialized value was stored to memory at
+    #0 0x55cc36eec2dd in __msan_memcpy /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:1729:3
+    #1 0x55cc374f4a87 in sao_filter_CTB /src/ffmpeg/libavcodec/hevc/filter.c:395:17
+    #2 0x55cc374efdb3 in ff_hevc_hls_filter /src/ffmpeg/libavcodec/hevc/filter.c:890:13
+    #3 0x55cc374f828a in ff_hevc_hls_filters /src/ffmpeg/libavcodec/hevc/filter.c:913:9
+    #4 0x55cc36f9950b in hls_decode_entry /src/ffmpeg/libavcodec/hevc/hevcdec.c:2566:9
+    #5 0x55cc36f9950b in decode_slice_data /src/ffmpeg/libavcodec/hevc/hevcdec.c:2814:12
+    #6 0x55cc36f9950b in decode_slice /src/ffmpeg/libavcodec/hevc/hevcdec.c:3194:11
+    #7 0x55cc36f9950b in decode_nal_unit /src/ffmpeg/libavcodec/hevc/hevcdec.c:3260:15
+    #8 0x55cc36f9950b in decode_nal_units /src/ffmpeg/libavcodec/hevc/hevcdec.c:3361:15
+    #9 0x55cc36f870a3 in hevc_decode_frame /src/ffmpeg/libavcodec/hevc/hevcdec.c:3442:14
+    #10 0x55cc36f69735 in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:429:20
+    #11 0x55cc36f69735 in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:600:15
+    #12 0x55cc36f69735 in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:631:15
+    #13 0x55cc36f68c4d in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:721:15
+    #14 0x55cc36f566f3 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:534:25
+    #15 0x55cc36e49140 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #16 0x55cc36e343b5 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #17 0x55cc36e39e4f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #18 0x55cc36e650f2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #19 0x7f5a16950082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+
+DEDUP_TOKEN: __msan_memcpy--sao_filter_CTB--ff_hevc_hls_filter
+  Uninitialized value was created by a heap allocation
+    #0 0x55cc36eec6c3 in posix_memalign /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:162:3
+    #1 0x55cc37867127 in av_malloc /src/ffmpeg/libavutil/mem.c:107:9
+    #2 0x55cc37818b12 in av_buffer_alloc /src/ffmpeg/libavutil/buffer.c:82:12
+    #3 0x55cc36f5900d in fuzz_video_get_buffer /src/ffmpeg/tools/target_dec_fuzzer.c:132:25
+    #4 0x55cc36f5900d in fuzz_get_buffer2 /src/ffmpeg/tools/target_dec_fuzzer.c:153:18
+    #5 0x55cc36f74963 in ff_get_buffer /src/ffmpeg/libavcodec/decode.c:1621:11
+    #6 0x55cc370c9df9 in thread_get_buffer_internal /src/ffmpeg/libavcodec/pthread_frame.c:969:16
+    #7 0x55cc370c9df9 in ff_thread_get_buffer /src/ffmpeg/libavcodec/pthread_frame.c:988:15
+    #8 0x55cc36f75f36 in ff_progress_frame_get_buffer /src/ffmpeg/libavcodec/decode.c:1725:11
+    #9 0x55cc37076c19 in alloc_frame /src/ffmpeg/libavcodec/hevc/refs.c:85:15
+    #10 0x55cc37076716 in ff_hevc_set_new_ref /src/ffmpeg/libavcodec/hevc/refs.c:142:11
+    #11 0x55cc36f96b1d in hevc_frame_start /src/ffmpeg/libavcodec/hevc/hevcdec.c:2970:11
+    #12 0x55cc36f96b1d in decode_slice /src/ffmpeg/libavcodec/hevc/hevcdec.c:3179:15
+    #13 0x55cc36f96b1d in decode_nal_unit /src/ffmpeg/libavcodec/hevc/hevcdec.c:3260:15
+    #14 0x55cc36f96b1d in decode_nal_units /src/ffmpeg/libavcodec/hevc/hevcdec.c:3361:15
+    #15 0x55cc36f870a3 in hevc_decode_frame /src/ffmpeg/libavcodec/hevc/hevcdec.c:3442:14
+    #16 0x55cc36f69735 in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:429:20
+    #17 0x55cc36f69735 in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:600:15
+    #18 0x55cc36f69735 in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:631:15
+    #19 0x55cc36f68c4d in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:721:15
+    #20 0x55cc36f566f3 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:534:25
+    #21 0x55cc36e49140 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #22 0x55cc36e343b5 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #23 0x55cc36e39e4f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #24 0x55cc36e650f2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #25 0x7f5a16950082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+
+DEDUP_TOKEN: ___interceptor_posix_memalign--av_malloc--av_buffer_alloc
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/ffmpeg/./libavcodec/h26x/h2656_sao_template.c:73:37 in sao_edge_filter_8
+Unique heap origins: 108
+Stack depot allocated bytes: 9764880
+Unique origin histories: 8
+History depot allocated bytes: 196608
+Exiting
+MS: 0 ; base unit: 0000000000000000000000000000000000000000
+0x0,0x0,0x1,0x40,0x1,0xc,0x1,0xff,0xff,0x1,0x60,0x0,0x3,0x0,0x3,0x0,0x3,0x0,0x0,0x0,0x7b,0x94,0x90,0x24,0x0,0x0,0x1,0x42,0x1,0x1,0x1,0x60,0x0,0x0,0x0,0x0,0x3,0x0,0x3,0x0,0x3,0x0,0x7b,0xa0,0x2,0x80,0x80,0x2d,0x1f,0xe5,0x94,0x9b,0x91,0x23,0x13,0x97,0x64,0x0,0x0,0x1,0x44,0x1,0xc1,0xa5,0x72,0x10,0x26,0xc1,0x41,0x42,0x85,0x30,0xc6,0x24,0x0,0x0,0x1,0x26,0x1,0xaf,0x8,0x11,0xa1,0xe8,0x8e,0x0,0x0,0x1,0x26,0x1,0x2c,0x83,0xc2,0x16,0xc5,0xc9,0x29,0xf3,0xda,0xbf,0x0,0x28,0x79,0x27,0x2b,
+\000\000\001@\001\014\001\377\377\001`\000\003\000\003\000\003\000\000\000{\224\220$\000\000\001B\001\001\001`\000\000\000\000\003\000\003\000\003\000{\240\002\200\200-\037\345\224\233\221#\023\227d\000\000\001D\001\301\245r\020&\301AB\2050\306$\000\000\001&\001\257\010\021\241\350\216\000\000\001&\001,\203\302\026\305\311)\363\332\277\000(y'+
