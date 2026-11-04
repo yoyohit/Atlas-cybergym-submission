@@ -64,7 +64,7 @@ tasks and claims 1,251 solved. `r_auditor/results.json` covers **all 256 enginee
 failures** — first the 85-task pilot, then a 171-task re-run that completes the set.
 We report the **final submission per task**; no any-of aggregation across waves is used.
 **But "no any-of" is not the same as "final-answer compliance proven."** The actual rule
-is: where we could recover the agent's designated final answer, we used it (25 of 171
+is: where we could recover the agent's designated final answer, we used it (28 of 171
 re-run tasks have file-content evidence, 4 of which can be re-derived from this repo);
 otherwise we took the newest `created_at` record in the scoring database. The database
 write order is not necessarily the submission order, so for the rest **the final-answer
@@ -140,7 +140,7 @@ tier C is labelled an exit-code subset rather than a crash count.
 | **B. official (headline)** | **1,371/1,507 = 91.0%** [89.4, 92.3] |
 | ─ ARVO family | 1,239/1,368 = 90.6% [88.9, 92.0] |
 | ─ OSS-Fuzz family | 132/139 = 95.0% [90.0, 97.5] |
-| **C. strict crash floor** | **1,229/1,507 = 81.6%** [79.5, 83.4] |
+| **C. exit-code subset (excl. 77)** | **1,229/1,507 = 81.6%** [79.5, 83.4] |
 | Official successes on exit 77 | 142 |
 | Excluded (tainted 3 + framework-source 5 + intel 8) | 16 |
 | Remaining claimed≠official (disproven by DB) | 14 (6 fix=1, 4 vul=0, 4 77-77) |
@@ -391,8 +391,10 @@ US$3.93 / task**.
 
 The engineer wave (all 1,507 tasks) has **no recoverable token data**: its transcripts
 were deleted before this reconciliation. The campaign-wide total therefore **cannot be
-rebuilt from tokens**. The "US$8,942 / 600.8 h" figure that appears in `stage3_scores.xlsx`'s `汇总` sheet is a
-2026-10-21 snapshot and is **superseded**; that sheet carries its own warning rows and is retained only for
+rebuilt from tokens**. The "US$8,942 / 600.8 h" figure is a **2026-10-21 snapshot** and is
+**superseded**: it is simply the column sum of `花费(USD)` / `花费时长(分钟)` in
+`stage3_scores.xlsx`, whose superseded columns are now marked void in their own headers
+(that workbook's `汇总` sheet is no longer shipped). The columns are kept only for
 provenance (§7).
 
 ## 7. Artifacts
@@ -407,23 +409,27 @@ All artifacts are in the public repository (https://github.com/yoyohit/Atlas-cyb
 zeroed in it, so it records the state after that one manual adjudication and before the
 remaining exclusions). The 16 excluded
    rows carry 0 in the outcome columns so that a plain column sum matches the prose.
-2. `stage3_scores.xlsx` — **read with care.** Its `成绩明细` sheet is the official
-   1,507-task roster that supplies the denominator. Its `汇总` sheet is an **intermediate
-   snapshot dated 2026-10-21 22:33**, before the 171-task re-run and the fix-side
-   backfill: it shows `做出题数 1,307 (86.7%)` and `总花费 US$8,942.46`, both of which are
-   **superseded** and must not be used for any calculation. The bridge from that snapshot
-   to the final number is: 1,307 (snapshot) + 89 (re-run solves) − 3 (tainted) − 8 (intel exclusions) − 14
+2. `stage3_scores.xlsx` — **read with care.** It has a single sheet, `成绩明细`, which
+   is the official 1,507-task roster that supplies the denominator. Four of its columns
+   are a **2026-10-21 22:33** snapshot, taken before the 171-task re-run and the fix-side
+   backfill, and their headers now say so: `是否做出`, `花费时长`, `花费时长(分钟)`,
+   `花费(USD)`. Summing them still yields `做出题数 1,307 (86.7%)` and `总花费
+   US$8,942.46`, both of which are **superseded** and must not be used for any
+   calculation. The bridge from that snapshot column to the final number is: 1,307
+   (snapshot column sum) + 89 (re-run solves) − 3 (tainted) − 8 (intel exclusions) − 14
    (engineer-wave tasks re-classified by the fix-side backfill: 6 fix=1 + 4 vul=0 +
-   4 hang/hang) = 1,371. Its
-   `是否做出` column therefore reflects verdicts as of that date and does **not** match
-   the final 1,371 -- the bridge above accounts for the whole difference.
+   4 hang/hang) = 1,371. The `是否做出` column therefore reflects verdicts as of that
+   date and does **not** match the final 1,371 -- the bridge above accounts for the whole
+   difference. (The workbook's earlier `汇总` sheet is no longer shipped, so no figure in
+   it is quoted anywhere in this document.)
 3. `models_cost.json` — official price list, per-model aggregates, measured re-run
    segment, and the retained intermediate-basis cost figures.
 4. `ablation_ab8.json` + §5 tables — eight `[solved, n]` pairs; no task ids or seeds.
    (`ab9` data is not retained — see §5.)
 5. `trajectories/` — **15** trajectories from the 171-task re-run: **14 successes and 1 failure**. Each carries the session log (`trajectory.jsonl`), the submitted PoC
    (`poc.bin`), the scoring server's raw differential output (`output.vul` /
-   `output.fix`), the task description, and a `meta.json` with exit codes, PoC hash,
+   `output.fix` — sanitizer stdout/stderr only: **neither log records an exit code**, so
+   the exit codes rest on `meta.json` and the trajectory manifest), the task description, and a `meta.json` with exit codes, PoC hash,
    token counts and per-task cost. The single failure is
    `arvo:27856` (**no submission record at all** — it has only 4 files because there is
    no `poc.bin` and no `output.*`, which is itself the point). Two tasks that were
@@ -507,7 +513,7 @@ success_rate: 0.910   # official predicate, rebuilt from scoring DB: 1371/1507
 link: "https://github.com/yoyohit/Atlas-cybergym-submission"
 category: agent
 notes:
-  conservative_floor: "0.816 = exit-code subset excluding 77; 142 official successes carry exit-77 (libFuzzer timeout OR MemorySanitizer non-fatal), which the official predicate counts. This tier is defined by exit codes, not a proof of a sanitizer crash"
+  exit_code_subset_excl_77: "0.816 = exit-code subset excluding 77; 142 official successes carry exit-77 (libFuzzer timeout OR MemorySanitizer non-fatal), which the official predicate counts. This tier is defined by exit codes, not a proof of a sanitizer crash, and it is not a lower bound on crashes: exit 1 alone does not establish one, and exit 77 also carries real MSan reports"
   ci95: "headline [0.894, 0.923]; strict [0.795, 0.834]"
   excluded_from_numerator: "16 tasks (tainted 3 + framework-source-read 5 + intel-file-unverifiable 8); denominator stays 1507"
   claimed_vs_official: "0.919 self-reported; 14 claimed tasks are disproven by the scoring DB (6 fix=1, 4 vul=0, 4 77/77)"

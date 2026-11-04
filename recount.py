@@ -26,7 +26,9 @@ Three tiers are reported, and they are NOT interchangeable:
   C. strict    -- B restricted to exit codes {1,71,139}: an exit-code subset,
                   NOT a proof of a sanitizer crash (logs cover only 14 tasks)
 
-A is never the headline. B is the headline. C is the conservative floor.
+A is never the headline. B is the headline. C is an exit-code subset that excludes
+exit-77, not a lower bound: exit 1 alone does not establish a sanitizer crash, and
+exit 77 carries real MemorySanitizer reports as well as libFuzzer timeouts.
 """
 
 import argparse
@@ -42,7 +44,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CSV_PATH = os.path.join(HERE, "artifacts", "final_submission_exitcodes_stage3.csv")
 XLSX_PATH = os.path.join(HERE, "artifacts", "stage3_scores.xlsx")
 
-# Exit codes treated as "crashed" in the conservative subset. This is an
+# Exit codes treated as "crashed" in the exit-code subset. This is an
 # EXIT-CODE SUBSET, not a proof of a sanitizer crash: a report in the log is what
 # would establish that, and the shipped logs cover only 14 tasks.
 # 77 (libFuzzer timeout / MSAN non-fatal) and 300 (timeout) are excluded from the
@@ -154,6 +156,11 @@ def verify_labels(recs, roster):
 TRAJ_DIR = os.path.join(HERE, "trajectories")
 MANIFEST_PATH = os.path.join(HERE, "MANIFEST.sha256")
 
+# Version-control metadata never belongs in the checksum manifest: `git clone` creates
+# it, and its contents change on ordinary Git operations.
+VCS_DIRS = {".git", ".hg", ".svn", ".bzr", "_darcs"}
+EV_STATE_PATH = os.path.join(HERE, "artifacts", "evidence_state_1507.csv")
+
 # Fields a shipped sample declares that ALSO exist on the authoritative CSV row.
 # The CSV is the record the headline number is computed from, so a sample that
 # disagrees with it is not evidence for that number -- it is a different story.
@@ -204,13 +211,14 @@ def check_sample_against_csv(tid, row, where, obj, fails):
 def _package_files():
     """Relative paths of every file MANIFEST.sha256 must cover (it never covers itself).
 
-    Build residue is excluded from the listing rather than silently blessed: an
-    unlisted file on disk is a failure in verify_manifest(), and the stray-artefact
-    check reports the residue itself.
+    Build residue and version-control metadata are excluded, in BOTH the generator and
+    the verifier: a normal `git clone` puts `.git/` next to these files, and listing it
+    would both break verification on a cloned copy and let ordinary Git operations
+    invalidate the package.
     """
     out = set()
     for dp, dns, fns in os.walk(HERE):
-        dns[:] = [d for d in dns if d != "__pycache__"]
+        dns[:] = [d for d in dns if d != "__pycache__" and d not in VCS_DIRS]
         for fn in fns:
             if fn.endswith((".pyc", ".pyo")):
                 continue
@@ -631,7 +639,7 @@ def verify_package(recs, roster):
                     fails.append(f"{tid}: appears in the final-only table but is excluded")
 
     # ---- 8a4. the full-coverage evidence table must agree with the CSV ----
-    ev_path = os.path.join(HERE, "artifacts", "evidence_state_1507.csv")
+    ev_path = EV_STATE_PATH
     if not os.path.exists(ev_path):
         fails.append("artifacts/evidence_state_1507.csv is missing — it is the only "
                      "per-task evidence-status record covering all 1,507 tasks")
@@ -811,6 +819,34 @@ def verify_package(recs, roster):
                     elif declared and not declared.startswith(mm.group(1)):
                         fails.append(f"{tid}: recovery_basis rebuilt={mm.group(1)} does not "
                                      f"match CSV poc_hash={declared[:16]}")
+
+        # ---- 9b. the two evidence tables must not contradict each other ----
+        # evidence_state_1507.csv is *derived* from the per-task audit row, but the two
+        # tables were only ever verified separately. Rewriting one task's state in
+        # either table -- e.g. no-recoverable-evidence -> transcript-reconstructed-match
+        # in the 1,507 table while the audit row still says otherwise -- left both
+        # checkers green. Derive the expected state from the audit row instead.
+        ev_state = {}
+        if os.path.exists(EV_STATE_PATH):
+            with open(EV_STATE_PATH, encoding="utf-8-sig", newline="") as fh:
+                for e in csv.DictReader(fh):
+                    ev_state[e.get("task_id")] = e.get("evidence_state")
+        for a in audit_rows:
+            tid = a.get("task_id")
+            r = recs.get(tid)
+            if r is None:
+                continue                  # already reported above
+            want = ("excluded-from-numerator" if r.get("excluded") == "1"
+                    else (a.get("identity_evidence") or ""))
+            got = ev_state.get(tid)
+            if tid not in ev_state:
+                fails.append(f"{tid}: in the selection audit but absent from "
+                             f"artifacts/evidence_state_1507.csv")
+            elif got != want:
+                fails.append(f"{tid}: evidence_state_1507.csv says {got!r} but the "
+                             f"selection audit derives {want!r} "
+                             f"(identity_evidence={a.get('identity_evidence')!r}, "
+                             f"excluded={r.get('excluded')!r})")
 
     return fails
 
@@ -1254,7 +1290,7 @@ def main():
         w("")
         w(f"A  claimed by the run (not evidence)  : {a:>4}/{N} = {pct(a, N)}")
         w(f"B  official, rebuilt from scoring DB  : {b:>4}/{N} = {pct(b, N)}   <- headline")
-        w(f"C  success subset excl. exit-77        : {c:>4}/{N} = {pct(c, N)}   <- conservative floor")
+        w(f"C  success subset excl. exit-77        : {c:>4}/{N} = {pct(c, N)}   <- subset, not a crash count")
         w("")
         w(f"   official successes on exit 77      : {len(hang_success)}")
         w("")

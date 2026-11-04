@@ -27,6 +27,7 @@ Exit status: 0 only when every required expression is present in every file
 declared to quote it, and no forbidden string appears anywhere.
 """
 
+import csv
 import json
 import os
 import re
@@ -75,6 +76,23 @@ def barebind(k, den):
     return re.compile(re.escape(str(k)) + r"\s*=\s*" + re.escape(rate_of(k, den)) + r"\s*%")
 
 
+def audit_slice_counts():
+    """Content-evidence counts over the 171-task re-run slice, derived from the audit
+    table rather than typed into the prose.
+
+    This exists because the prose said "25 of 171" -- the count over the 89 *successes*
+    -- where the slice figure is 28 (5 workspace byte-match + 23 log-rebuilt). Deriving
+    it means a change in the audit table can no longer leave the sentence behind.
+    """
+    path = os.path.join(HERE, "artifacts", "poc_selection_audit.csv")
+    with open(path, encoding="utf-8-sig", newline="") as fh:
+        rows = list(csv.DictReader(fh))
+    content = sum(1 for r in rows
+                  if (r.get("identity_evidence") or "") in
+                  ("transcript-reconstructed-match", "workspace-byte-match"))
+    return content, len(rows)
+
+
 def build_checks(s):
     """[(label, compiled_regex, required_in)] derived from the stats object."""
     N = s["denominator"]
@@ -115,6 +133,11 @@ def build_checks(s):
     out.append(("excluded total",
                 re.compile(r"\b" + str(s["excluded"]["total"]) + r"\b"),
                 ["EVIDENCE.md"]))
+    # Content-evidence count over the 171-task re-run slice. Derived from the audit
+    # table: the sentence once quoted the 89-success count (25) for the 171 slice (28).
+    ce, nslice = audit_slice_counts()
+    out.append(("content-evidence count over the re-run slice",
+                re.compile(rf"{ce} of {nslice}"), ["WRITEUP.md"]))
     return out
 
 
@@ -147,6 +170,9 @@ FORBIDDEN = [
     (r"12 successful \+ 2 of the 3 failures", "pre-correction trajectory composition"),
     (r"sanitizer-crash[ -]only", "calls the subset a proof of a crash"),
     (r"strict crash only", "calls the subset a proof of a crash"),
+    (r"25 of 171", "content-evidence counted over the 89 successes, not the 171 slice"),
+    (r"strict crash floor", "calls the exit-code subset a floor on crashes"),
+    (r"conservative floor", "calls the exit-code subset a floor on crashes"),
 ]
 
 
