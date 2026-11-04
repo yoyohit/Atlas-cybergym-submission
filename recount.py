@@ -152,6 +152,168 @@ def verify_labels(recs, roster):
 
 
 TRAJ_DIR = os.path.join(HERE, "trajectories")
+MANIFEST_PATH = os.path.join(HERE, "MANIFEST.sha256")
+
+# Fields a shipped sample declares that ALSO exist on the authoritative CSV row.
+# The CSV is the record the headline number is computed from, so a sample that
+# disagrees with it is not evidence for that number -- it is a different story.
+SAMPLE_TO_CSV = (
+    ("vul_exit_code", "vul_exit_code"),
+    ("fix_exit_code", "fix_exit_code"),
+    ("agent_id", "agent_id"),
+    ("poc_id", "final_poc_id"),
+    ("poc_sha256", "poc_hash"),
+    ("official_success", "official_success"),
+    ("strict_crash", "strict_crash"),
+    ("claimed_success", "claimed_success"),
+    ("role", "role"),
+)
+
+
+def _norm(v):
+    """Normalise a declared value for comparison with a CSV cell.
+
+    meta.json/manifest.json store `official_success` as a JSON boolean while the CSV
+    stores "1"/"0"; comparing them as strings makes every row a false positive, and
+    skipping them leaves the sample's own conclusion unchecked.
+    """
+    if isinstance(v, bool):
+        return "1" if v else "0"
+    if v is None:
+        return ""
+    return str(v).strip()
+
+
+def check_sample_against_csv(tid, row, where, obj, fails):
+    """Every field a sample declares must equal the authoritative CSV row.
+
+    Why this exists: the two trajectory files were only ever compared with each
+    OTHER (manifest.json vs meta.json). Editing both to the same value that the CSV
+    contradicts left every rule satisfied -- a sample could claim `fix_exit_code=1`
+    on a task the table records as a clean fix, and both checkers still exited 0.
+    """
+    for skey, ckey in SAMPLE_TO_CSV:
+        if skey not in obj:
+            continue                      # presence is enforced by 8a2 / 8e
+        if _norm(obj[skey]) != _norm(row.get(ckey)):
+            fails.append(f"{tid}: {where} {skey}={obj[skey]!r} but the CSV row says "
+                         f"{ckey}={row.get(ckey)!r} — the sample contradicts the "
+                         f"authoritative record")
+
+
+def _package_files():
+    """Relative paths of every file MANIFEST.sha256 must cover (it never covers itself).
+
+    Build residue is excluded from the listing rather than silently blessed: an
+    unlisted file on disk is a failure in verify_manifest(), and the stray-artefact
+    check reports the residue itself.
+    """
+    out = set()
+    for dp, dns, fns in os.walk(HERE):
+        dns[:] = [d for d in dns if d != "__pycache__"]
+        for fn in fns:
+            if fn.endswith((".pyc", ".pyo")):
+                continue
+            rel = os.path.relpath(os.path.join(dp, fn), HERE).replace(os.sep, "/")
+            if rel != os.path.basename(MANIFEST_PATH):
+                out.add(rel)
+    return out
+
+
+def _sha256_file(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def verify_manifest():
+    """Check every shipped file against MANIFEST.sha256, and the manifest against the
+    package contents.
+
+    Why this exists: the manifest shipped for several revisions while **no script
+    referenced it**. Between 2026-11-02 11:01 and 2026-11-03 21:51 README.md and
+    artifacts/stage3_scores.xlsx were edited, their recorded digests went stale, and
+    recount.py and check_docs.py both still exited 0. An integrity record that nothing
+    verifies is decoration.
+
+    Scope, stated plainly: this is an accident detector, not a signature. Anyone who
+    edits a file can run `--regen-manifest` and make it pass again. What it does catch
+    is "a file changed and nobody noticed", which is the failure that actually happened.
+    """
+    fails = []
+    if not os.path.exists(MANIFEST_PATH):
+        return ["MANIFEST.sha256 is missing — the package ships a checksum record, so "
+                "verifying it cannot be skipped"]
+    declared = {}
+    with open(MANIFEST_PATH, encoding="utf-8") as fh:
+        for lineno, line in enumerate(fh, start=1):
+            line = line.strip()
+            if not line:
+                continue
+            parts = line.split(None, 1)
+            if len(parts) != 2 or not re.fullmatch(r"[0-9a-f]{64}", parts[0]):
+                fails.append(f"MANIFEST.sha256:{lineno} is not '<sha256>  <path>': "
+                             f"{line[:48]!r}")
+                continue
+            want, rel = parts[0], parts[1].strip().replace("\\", "/")
+            if rel.startswith("/") or ".." in rel.split("/") or ":" in rel.split("/")[0]:
+                fails.append(f"MANIFEST.sha256:{lineno} path is not inside the package: "
+                             f"{rel!r}")
+                continue
+            if rel in declared:
+                fails.append(f"MANIFEST.sha256 lists {rel} twice "
+                             f"(lines {declared[rel][0]} and {lineno})")
+                continue
+            declared[rel] = (lineno, want)
+
+    if not declared:
+        # An empty manifest would otherwise satisfy every comparison below by vacuity.
+        fails.append("MANIFEST.sha256 declares no files — an empty checksum record is "
+                     "not a clean package")
+    self_rel = os.path.basename(MANIFEST_PATH)
+    for rel, (lineno, want) in sorted(declared.items()):
+        if rel == self_rel:
+            fails.append("MANIFEST.sha256 lists itself; its own digest cannot be inside it")
+            continue
+        path = os.path.join(HERE, rel.replace("/", os.sep))
+        if not os.path.exists(path):
+            fails.append(f"{rel} is listed in MANIFEST.sha256 (line {lineno}) but the "
+                         f"file is missing")
+            continue
+        if not os.path.isfile(path):
+            fails.append(f"{rel} is listed in MANIFEST.sha256 but is not a regular file")
+            continue
+        got = _sha256_file(path)
+        if got != want:
+            fails.append(f"{rel}: sha256={got[:16]}… does not match MANIFEST.sha256="
+                         f"{want[:16]}… — the file changed after the manifest was "
+                         f"written (regenerate it as the last step: "
+                         f"python recount.py --regen-manifest)")
+
+    unlisted = sorted(_package_files() - set(declared))
+    if unlisted:
+        fails.append(f"{len(unlisted)} file(s) are in the package but not listed in "
+                     f"MANIFEST.sha256: {unlisted[:3]}")
+    return fails
+
+
+def regen_manifest():
+    """Rewrite MANIFEST.sha256 from the current package contents.
+
+    Run this LAST: the manifest covers recount.py and README.md too, so editing them
+    makes verify_manifest() fail until it is regenerated. That is the intended
+    forcing function -- the stale-hash defect this replaces happened precisely because
+    regenerating was a manual step somebody had to remember.
+    """
+    files = sorted(_package_files())
+    lines = [f"{_sha256_file(os.path.join(HERE, rel.replace('/', os.sep)))}  {rel}"
+             for rel in files]
+    with open(MANIFEST_PATH, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("\n".join(lines) + "\n")
+    print(f"MANIFEST.sha256 rewritten: {len(lines)} files")
+    return 0
 
 
 def verify_package(recs, roster):
@@ -167,6 +329,9 @@ def verify_package(recs, roster):
       6  adjusted labels may only be 1 where the raw label was 1, and a row whose
          raw label is 1 but adjusted label is 0 must be an excluded row
       7  published poc.bin must match the CSV/meta SHA256 and length
+      7b every shipped sample's declaration (exit codes, agent, PoC identity,
+         verdict) must equal the authoritative CSV row -- otherwise the sample is
+         not evidence for the headline number
       8  trajectories/manifest.json must agree with each per-task meta.json
     """
     fails = []
@@ -293,10 +458,11 @@ def verify_package(recs, roster):
             if r is None:
                 fails.append(f"manifest lists {tid} which is absent from the CSV")
                 continue
-            for mkey, ckey in (("poc_sha256", "poc_hash"), ("poc_id", "final_poc_id")):
-                mv, cv = entry.get(mkey), r.get(ckey)
-                if mv and cv and mv != cv:
-                    fails.append(f"{tid}: manifest {mkey}={mv[:16]}… != CSV {ckey}={cv[:16]}…")
+            # ---- 7b. the sample's declaration must match the authoritative CSV ----
+            # Before, only the PoC identity was cross-checked here; exit codes,
+            # agent and verdict were compared manifest-vs-meta only, so both files
+            # could be edited together to a story the CSV contradicts.
+            check_sample_against_csv(tid, r, "manifest", entry, fails)
             if entry.get("poc_length") is not None and r.get("poc_hash"):
                 pass  # length is implied by the hash; checked below against the file
 
@@ -325,6 +491,9 @@ def verify_package(recs, roster):
                         fails.append(f"{tid}: manifest tokens.{k}={et.get(k)!r} != meta {mt.get(k)!r}")
             if meta.get("task_id") and meta["task_id"] != tid:
                 fails.append(f"{tid}: meta.json declares task_id={meta['task_id']!r}")
+
+            # ---- 8. (cont) the same CSV cross-check for the per-task meta.json ----
+            check_sample_against_csv(tid, r, "meta.json", meta, fails)
 
             # ---- 8a. every shipped sample must carry its required files ----
             # The official rule asks for trajectories + logs + PoC. A directory that
@@ -738,7 +907,14 @@ def main():
                     help="emit the statistics object for the figures this script derives "
                        "(success rates, slice, set relations). It does NOT derive cost, "
                        "historical DB reports or evidence provenance")
+    ap.add_argument("--regen-manifest", action="store_true",
+                    help="rewrite MANIFEST.sha256 from the current package contents and "
+                       "exit. Run this LAST, after every other edit: the manifest covers "
+                       "recount.py and README.md too")
     args = ap.parse_args()
+
+    if args.regen_manifest:
+        return regen_manifest()
 
     roster = load_roster()
     recs = load_records()
@@ -847,6 +1023,7 @@ def main():
     if label_errors:
         integrity_failures.append(f"{len(label_errors)} label(s) disagree with the exit codes: {label_errors[:3]}")
     integrity_failures.extend(verify_package(recs, roster))
+    integrity_failures.extend(verify_manifest())
     bridge = bridge_numbers(recs, roster)
     rel = set_relations(recs, roster)
     anyof = final_only_evidence()

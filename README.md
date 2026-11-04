@@ -43,8 +43,16 @@
 
 ```
 pip install openpyxl pyyaml
-python recount.py --card    # 成绩复算
+python recount.py --card    # 成绩复算 + MANIFEST.sha256 逐条校验
 python check_docs.py        # 已配置的文档一致性规则
 ```
 
 两者任一校验失败都会**非零退出**，四种输出模式（默认 / `--card` / `--md` / `--json`）一致。
+
+`recount.py` 会把 `MANIFEST.sha256` 列出的每个文件逐条重算，并把"磁盘上有文件但清单没列"也算失败。因此**改过任何文件之后必须最后重生成清单**：
+
+```
+python recount.py --regen-manifest   # 最后一步：重写 MANIFEST.sha256
+```
+
+清单是**事故检测，不是签名**：任何改过文件的人都能重跑上面这条命令让它重新变绿。它能抓住的是"文件被改而清单没跟上"——本包确实发生过一次（`README.md` 与 `artifacts/stage3_scores.xlsx` 在清单写下之后被编辑，两个检查脚本仍然退出 0）。
